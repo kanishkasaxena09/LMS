@@ -29,7 +29,6 @@ const shouldUsePglite =
   env.DATABASE_URL.startsWith("pglite") ||
   env.DATABASE_URL.startsWith("file:") ||
   process.env.USE_PGLITE === "true" ||
-  fs.existsSync(localDbDir) ||
   env.DATABASE_URL.includes("localhost:5432");
 
 let clientInstance: any;

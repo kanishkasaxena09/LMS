@@ -1,5 +1,6 @@
 import postgres from "postgres";
 import { env } from "../config/env";
+import { isPglite } from "../db/client";
 
 function preflight(raw: string) {
   let url: URL;
@@ -43,16 +44,14 @@ function preflight(raw: string) {
 }
 
 async function main() {
-  const usingPglite =
-    env.DATABASE_URL.startsWith("pglite") ||
-    env.DATABASE_URL.startsWith("file:") ||
-    process.env.USE_PGLITE === "true";
+  const usingPglite = isPglite;
 
   console.log(`\nDATABASE_URL source: ${process.env.DATABASE_URL ? ".env.local / shell" : "not set — falling back to default"}`);
+  console.log(`  driver     ${usingPglite ? "PGlite (local file database)" : "postgres (remote server)"}`);
 
   if (usingPglite) {
     console.error(
-      "\n✗ Using PGlite (embedded file database), not a remote server.\n  Migrations would run against a local file, not Supabase.\n  Set DATABASE_URL to a postgresql:// URL, or remove data/lms-db/ and USE_PGLITE.",
+      "\n✗ Using PGlite (embedded file database), not a remote server.\n  Migrations would run against a local file, not Supabase.\n  Set DATABASE_URL to a postgresql:// URL, or set USE_PGLITE=true to stay local.",
     );
     process.exit(1);
   }
