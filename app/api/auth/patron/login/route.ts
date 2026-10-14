@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { PATRON_SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 import { loginPatron } from "@/services/auth";
 
 export async function POST(req: NextRequest) {
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    logger.error({ err }, "Patron login route failed");
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

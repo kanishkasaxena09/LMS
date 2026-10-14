@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { AuthenticationError, ForbiddenError, requirePermission } from "@/lib/auth";
 import { CSRF_HEADER_NAME, validateCsrfToken } from "@/lib/csrf";
+import { logger } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
     if (err instanceof AuthenticationError) {
       return NextResponse.json({ error: err.message }, { status: 401 });
     }
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    logger.error({ err }, "Permission test route failed");
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
