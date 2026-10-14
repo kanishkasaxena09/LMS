@@ -10,10 +10,22 @@ import * as schema from "@/db/schema";
 export type AnyDatabase = PostgresJsDatabase<typeof schema> | PgliteDatabase<typeof schema>;
 
 // Connection pool options for remote / standalone PostgreSQL
+//
+// Pair these with Supabase's transaction pooler (port 6543), not the session
+// pooler. The session pooler caps the whole project at 15 concurrent clients
+// (EMAXCONNSESSION), and Vercel runs several function instances in parallel,
+// so each request queues until connect_timeout expires. The transaction pooler
+// multiplexes many clients over few real connections instead.
+//
+// max 1 because the pooler already pools; opening more per instance only
+// competes for the same upstream connections.
+// prepare false because transaction-mode pooling does not guarantee a single
+// session across a transaction, which named prepared statements require.
 const connectionOptions = {
-  max: 10,
+  max: 1,
   idle_timeout: 20,
   connect_timeout: 10,
+  prepare: false,
   onnotice: () => {}, // Suppress notice logs in production
 };
 

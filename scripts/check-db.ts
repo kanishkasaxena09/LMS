@@ -17,9 +17,9 @@ function preflight(raw: string) {
   if (url.password.includes("[") || url.password.toUpperCase().includes("YOUR-PASSWORD")) {
     problems.push("Password is still the literal placeholder. Replace [YOUR-PASSWORD].");
   }
-  if (url.port === "6543") {
+  if (url.port === "5432") {
     warnings.push(
-      "Port 6543 is the transaction pooler; postgres.js uses prepared statements. Use session pooler 5432.",
+      "Port 5432 is Supabase's session pooler, capped at 15 concurrent clients for the whole project. Under Vercel that queues requests into slow pages and errors. Use port 6543 (transaction pooler) instead.",
     );
   }
   if (!raw.includes("sslmode")) {
